@@ -1,10 +1,10 @@
 {
   "name": "dongle",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "This is a route adapter for REST-like interfaces",
   "main": "index.js",
   "scripts": {
-  "test": "node_modules/.bin/mocha"
+    "test": "node_modules/.bin/mocha"
   },
   "repository": {
     "type": "git",
