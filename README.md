@@ -1,4 +1,4 @@
-![status](https://secure.travis-ci.org/plus3network/dongle.png?branch=master)
+[![Build Status](https://travis-ci.org/plus3network/dongle.png?branch=master)](https://travis-ci.org/plus3network/dongle)
 
 ## Information
 
