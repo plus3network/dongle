@@ -8,7 +8,7 @@
 </tr>
 <tr>
 <td>Description</td>
-<td>A route adapter for Express REST-like interfaces. This library will allow you transform requests to one interface and forward them to another and then let you transform the results.</td>
+<td>A route adapter for Express REST-like interfaces. This library will allow you transform requests to one interface and forward them to another. Once the requst is returned you can transform the results. This primary use case for this module is when you need to support legacy interfaces but you want to have all teh business logic in the same place.</td>
 </tr>
 <tr>
 <td>Node Version</td>
@@ -19,7 +19,33 @@
 ## Usage
 
 ```javascript
-NOTHING HERE YET
+var express = require('express');
+var app = express();
+var dongle = require('dongle');
+var adapter = dongle({ hostname: "localhost", port: 6767 });
+
+var input = function (request) {
+  request.body = {
+    name: {
+      first: request.body.first_name,
+      last: request.body.last_name
+    }
+  };
+};
+
+var output = function (response, data) {
+  return {
+    first_name: data.name.first_name,
+    last_name: data.name.last
+  }; 
+};
+
+app.put('/v1/user', adapter(input, output, "/v2/user/<%= user.id %>"));
+app.put('/v2/user/:id', function (req, res, next) {
+  // do stuff here with the database and a bunch of business logic
+  res.send(201, req.body);
+});
+
 ```
 
 ## LICENSE
