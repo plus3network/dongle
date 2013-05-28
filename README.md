@@ -8,7 +8,7 @@
 </tr>
 <tr>
 <td>Description</td>
-<td>A route adapter for Express REST-like interfaces. This library will allow you transform requests to one interface and forward them to another. Once the requst is returned you can transform the results. The primary use case for this module is when you need to support legacy interfaces but you want to have all teh business logic in the same place.</td>
+<td>A route adapter for Express REST-like interfaces. This library will allow you transform requests to one interface and forward them to another. Once the requst is returned you can transform the results. The primary use case for this module is when you need to support legacy interfaces but you want to have all the business logic in the same place.</td>
 </tr>
 <tr>
 <td>Node Version</td>
