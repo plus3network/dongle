@@ -19,7 +19,7 @@ describe('get', function () {
       return data;
     };
 
-    var url = "/v2/simple/<%= params.id %>";
+    var url = "/v2/simple/<%= req.params.id %>";
 
     app.get('/v2/simple/:id', function (req, res, next) {
       res.send(200, { message: "ok", id: req.params.id });

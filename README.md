@@ -40,7 +40,7 @@ var output = function (response, data) {
   }; 
 };
 
-app.put('/v1/user', adapter(input, output, "/v2/user/<%= user.id %>"));
+app.put('/v1/user', adapter(input, output, "/v2/user/<%= req.query.id %>"));
 app.put('/v2/user/:id', function (req, res, next) {
   // do stuff here with the database and a bunch of business logic
   res.send(201, req.body);

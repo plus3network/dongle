@@ -24,16 +24,10 @@ module.exports = function (options) {
       // transform the inbound request
       req = transformIn(req); 
 
-      // Assign the locals for the url template
-      locals.query = req.query || {};
-      locals.params = req.params || {};
-      locals.user = req.user || {};
-      locals.body = req.body || {};
-
       // extend the url object options
       _.extend(urlObject, options, {
         query: req.query,
-        pathname: template(locals)
+        pathname: template({ req: req })
       });
 
 

@@ -40,7 +40,7 @@ describe('put', function () {
       };
     };
 
-    app.put('/v1/simple', adapter(input, output, "/v2/simple/<%= params.id %>"));
+    app.put('/v1/simple', adapter(input, output, "/v2/simple/<%= req.params.id %>"));
 
     app.put('/v2/simple/:id', function (req, res, next) {
       res.send(201, req.body);
