@@ -22,7 +22,8 @@
   "devDependencies": {
     "mocha": "~1.10.0",
     "express": "~3.2.5",
-    "should": "~1.2.2"
+    "should": "~1.2.2",
+    "cookie-signature": "~1.0.1"
   },
   "dependencies": {
     "request": "~2.21.0",
