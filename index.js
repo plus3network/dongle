@@ -41,44 +41,50 @@ module.exports = function (options) {
     });
   }
 
-  return function (transformIn, transfromOut, urlTemplate) {
+  return function (transformIn, transformOut, urlTemplate) {
     var template = templates[urlTemplate] || _.template(urlTemplate);
 
     return function (req, res, next) {
       var locals = {}, opts = {}, urlObject = {};
 
       // transform the inbound request
-      req = transformIn(req); 
-
-      // extend the url object options
-      _.extend(urlObject, options, {
-        query: req.query,
-        pathname: template({ req: req })
-      });
-
-      // setup the request object
-      opts.url = url.format(urlObject);
-      opts.method = req.method;
-      opts.headers = _.pick(req.headers, options.forwardHeaders);
-      opts.headers.cookie = req.headers.cookie;
-      opts.json = true; // we assume that this a JSON rest endpoint
-      opts.jar = request.jar();
-
-      // for PUT and POST request we need to set the requset body
-      if (opts.method === 'PUT' || opts.method === 'POST') opts.json = req.body;
-
-      // proxy the requset to the target interface
-      request(opts, function (err, resp, body) {
+      transformIn(req, function (err, req) {
         if (err) return next(err);
 
-        // forward the cookies
-        opts.jar.cookies.forEach(function (cookie) {
-          checkAndSetCookie(res, cookie.str);
+        // extend the url object options
+        _.extend(urlObject, options, {
+          query: req.query,
+          pathname: template({ req: req })
         });
 
-        // transform the response and send it.
-        res.send(resp.statusCode, transfromOut(resp, body));
-      });
+        // setup the request object
+        opts.url = url.format(urlObject);
+        opts.method = req.method;
+        opts.headers = _.pick(req.headers, options.forwardHeaders);
+        opts.headers.cookie = req.headers.cookie;
+        opts.json = true; // we assume that this a JSON rest endpoint
+        opts.jar = request.jar();
+
+        // for PUT and POST request we need to set the requset body
+        if (opts.method === 'PUT' || opts.method === 'POST') opts.json = req.body;
+
+          // proxy the requset to the target interface
+          request(opts, function (err, resp, body) {
+            if (err) return next(err);
+
+              // forward the cookies
+              opts.jar.cookies.forEach(function (cookie) {
+                checkAndSetCookie(res, cookie.str);
+              });
+
+              // transform the response and send it.
+              transformOut(resp, body, function (err, data) {
+                if (err) return next(err);
+                  res.send(resp.statusCode, data);
+              });
+          });
+      }); 
+
     };
   };
 

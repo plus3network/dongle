@@ -24,20 +24,21 @@ var app = express();
 var dongle = require('dongle');
 var adapter = dongle({ hostname: "localhost", port: 6767 });
 
-var input = function (request) {
+var input = function (request, callback) {
   request.body = {
     name: {
       first: request.body.first_name,
       last: request.body.last_name
     }
   };
+  callback(null, request);
 };
 
-var output = function (response, data) {
-  return {
+var output = function (response, data, callback) {
+  callback(null, {
     first_name: data.name.first_name,
     last_name: data.name.last
-  }; 
+  }); 
 };
 
 app.put('/v1/user', adapter(input, output, "/v2/user/<%= req.query.id %>"));

@@ -33,13 +33,13 @@ describe('headers', function () {
       port: '6767'
     });
 
-    var input = function (request) {
+    var input = function (request, callback) {
       request.params.id = request.body.id;
-      return request;
+      callback(null, request);
     };
 
-    var output = function (response, data) {
-      return data;
+    var output = function (response, data, callback) {
+      callback(null, data);
     };
 
     var clobberCookieMiddleware = function (req, res, next) {

@@ -9,14 +9,15 @@ describe('get', function () {
 
   before(function (done) {
     var adapter = dongle({ hostname: "localhost", port: '6767' });
-    var transformIn = function (request) {
+
+    var transformIn = function (request, callback) {
       request.params.id = 123;
-      return request;
+      callback(null, request);
     };
 
-    var transfromOut = function (response, data) {
+    var transfromOut = function (response, data, callback) {
       data.message = "Okay";
-      return data;
+      callback(null, data);
     };
 
     var url = "/v2/simple/<%= req.params.id %>";

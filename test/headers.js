@@ -27,13 +27,13 @@ describe('headers', function () {
       forwardHeaders: ['x-token']
     });
 
-    var input = function (request) {
+    var input = function (request, callback) {
       request.params.id = request.body.id;
-      return request;
+      callback(null, request);
     };
 
-    var output = function (response, data) {
-      return data;
+    var output = function (response, data, callback) {
+      callback(null, data);
     };
 
     app.put('/v1/test', adapter(input, output, "/v2/test/<%= req.params.id %>"));

@@ -19,7 +19,7 @@ describe('put', function () {
   before(function (done) {
     var adapter = dongle({ hostname: "localhost", port: '6767' });
 
-    var input = function (request) {
+    var input = function (request, callback) {
       request.params.id = request.body.id;
       request.body = {
         _id: request.body.id,
@@ -29,15 +29,15 @@ describe('put', function () {
         }
       };
 
-      return request;
+      callback(null, request);
     };
 
-    var output = function (response, data) {
-      return { 
+    var output = function (response, data, callback) {
+      callback(null, { 
         id: data._id, 
         first_name: data.name.first, 
         last_name: data.name.last
-      };
+      });
     };
 
     app.put('/v1/simple', adapter(input, output, "/v2/simple/<%= req.params.id %>"));
