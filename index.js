@@ -19,6 +19,7 @@ var checkAndSetCookie = function (res, str) {
 
     // see if the cookie already exists
     var existingCookie = _.find(sets, function (cookie) {
+      if (!cookie) return false;
       var m = cookie.match(/^([^=]+)=.*/);
       return m && name === m[1];
     });
