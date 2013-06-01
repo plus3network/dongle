@@ -26,12 +26,7 @@ var options = {
 
 describe('headers', function () {
 
-  before(function (done) {
-
-    var adapter = dongle({ 
-      hostname: "localhost", 
-      port: '6767'
-    });
+  beforeEach(function (done) {
 
     var input = function (request, callback) {
       request.params.id = request.body.id;
@@ -42,15 +37,9 @@ describe('headers', function () {
       callback(null, data);
     };
 
-    var clobberCookieMiddleware = function (req, res, next) {
-      res.cookie('clobber', 'no');
-      next();
-    };
-
-    app.put('/v1/cookies', clobberCookieMiddleware, adapter(input, output, "/v2/cookies/<%= req.params.id %>"));
+    app.put('/v1/cookies', dongle(input, output, "/v2/cookies/<%= req.params.id %>"));
 
     app.put('/v2/cookies/:id', function (req, res, next) {
-      res.cookie('clobber', 'yes');
       res.cookie('regular', 'test');
       res.cookie('signed', 'test', { signed: true  });
       res.send(201, { cookies: req.cookies, signedCookies: req.signedCookies });
@@ -59,7 +48,7 @@ describe('headers', function () {
     server.listen(app.get('port'), done);
   });
 
-  after(function (done) {
+  afterEach(function (done) {
     server.close(done);
   });
 
@@ -96,17 +85,5 @@ describe('headers', function () {
       done();
     });
   });
-
-  it('should not clobber cookies', function (done) {
-    request(options, function (err, resp, body) {
-      var cookie = _.find(options.jar.cookies, function (cookie) {
-        return cookie.name === 'clobber';
-      });      
-      should.exist(cookie);
-      cookie.value.should.eql('no');
-      done();
-    });
-  });
-
 
 });

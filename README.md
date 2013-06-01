@@ -22,7 +22,6 @@
 var express = require('express');
 var app = express();
 var dongle = require('dongle');
-var adapter = dongle({ hostname: "localhost", port: 6767 });
 
 var input = function (request, callback) {
   request.body = {
@@ -41,7 +40,7 @@ var output = function (response, data, callback) {
   }); 
 };
 
-app.put('/v1/user', adapter(input, output, "/v2/user/<%= req.query.id %>"));
+app.put('/v1/user', dongle(input, output, "/v2/user/<%= req.query.id %>"));
 app.put('/v2/user/:id', function (req, res, next) {
   // do stuff here with the database and a bunch of business logic
   res.send(201, req.body);

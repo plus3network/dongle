@@ -19,13 +19,7 @@ var options = {
 
 describe('headers', function () {
 
-  before(function (done) {
-
-    var adapter = dongle({ 
-      hostname: "localhost", 
-      port: '6767', 
-      forwardHeaders: ['x-token']
-    });
+  beforeEach(function (done) {
 
     var input = function (request, callback) {
       request.params.id = request.body.id;
@@ -36,7 +30,7 @@ describe('headers', function () {
       callback(null, data);
     };
 
-    app.put('/v1/test', adapter(input, output, "/v2/test/<%= req.params.id %>"));
+    app.put('/v1/test', dongle(input, output, "/v2/test/<%= req.params.id %>"));
 
     app.put('/v2/test/:id', function (req, res, next) {
       res.send(201, req.headers);
@@ -45,7 +39,7 @@ describe('headers', function () {
     server.listen(app.get('port'), done);
   });
 
-  after(function (done) {
+  afterEach(function (done) {
     server.close(done);
   });
 
