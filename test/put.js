@@ -16,8 +16,7 @@ var options = {
 
 describe('put', function () {
 
-  before(function (done) {
-    var adapter = dongle({ hostname: "localhost", port: '6767' });
+  beforeEach(function (done) {
 
     var input = function (request, callback) {
       request.params.id = request.body.id;
@@ -40,7 +39,7 @@ describe('put', function () {
       });
     };
 
-    app.put('/v1/simple', adapter(input, output, "/v2/simple/<%= req.params.id %>"));
+    app.put('/v1/simple', dongle(input, output, "/v2/simple/<%= req.params.id %>"));
 
     app.put('/v2/simple/:id', function (req, res, next) {
       res.send(201, req.body);
@@ -49,7 +48,7 @@ describe('put', function () {
     server.listen(app.get('port'), done);
   });
 
-  after(function (done) {
+  afterEach(function (done) {
     server.close(done);
   });
 

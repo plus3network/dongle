@@ -29,64 +29,40 @@ var checkAndSetCookie = function (res, str) {
   }
 };
 
-module.exports = function (options) {
+module.exports = function (transformIn, transformOut, urlTemplate) {
+  var template = templates[urlTemplate] || _.template(urlTemplate);
 
-  if (typeof(options) === "string") {
-    options = url.parse(options);   
-  } else {
-    options = _.defaults(options, {
-      protocol: 'http',
-      port: '80', 
-      hostname: 'localhost',
-      forwardHeaders: []
-    });
-  }
+  return function (req, res, next) {
+    var locals = {}, opts = {}, urlObject = {};
 
-  return function (transformIn, transformOut, urlTemplate) {
-    var template = templates[urlTemplate] || _.template(urlTemplate);
+    // transform the inbound request
+    transformIn(req, function (err, req) {
+      if (err) return next(err);
 
-    return function (req, res, next) {
-      var locals = {}, opts = {}, urlObject = {};
+      var oldSend = res.send;
+      res.send = function (body) {
+        // Taken form Express resposne module
+        // allow status / body
+        if (2 == arguments.length) {
+          // res.send(body, status) backwards compat
+          if ('number' != typeof body && 'number' == typeof arguments[1]) {
+            this.statusCode = arguments[1];
+          } else {
+            this.statusCode = body;
+            body = arguments[1];
+          }
+        }
 
-      // transform the inbound request
-      transformIn(req, function (err, req) {
-        if (err) return next(err);
-
-        // extend the url object options
-        _.extend(urlObject, options, {
-          query: req.query,
-          pathname: template({ req: req })
+        transformOut(res, body, function (err, data) {
+          res.send = oldSend;
+          res.send.call(res, data);
         });
 
-        // setup the request object
-        opts.url = url.format(urlObject);
-        opts.method = req.method;
-        opts.headers = _.pick(req.headers, options.forwardHeaders);
-        opts.headers.cookie = req.headers.cookie;
-        opts.json = true; // we assume that this a JSON rest endpoint
-        opts.jar = request.jar();
-
-        // for PUT and POST request we need to set the requset body
-        if (opts.method === 'PUT' || opts.method === 'POST') opts.json = req.body;
-
-          // proxy the requset to the target interface
-          request(opts, function (err, resp, body) {
-            if (err) return next(err);
-
-              // forward the cookies
-              opts.jar.cookies.forEach(function (cookie) {
-                checkAndSetCookie(res, cookie.str);
-              });
-
-              // transform the response and send it.
-              transformOut(resp, body, function (err, data) {
-                if (err) return next(err);
-                  res.send(resp.statusCode, data);
-              });
-          });
-      }); 
-
-    };
+      };
+      req.url = template({ req: req });
+      req.originalUrl = req.url;
+      req.app.handle(req, res);
+      return;
+    }); 
   };
-
 };

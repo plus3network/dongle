@@ -7,8 +7,7 @@ var request = require('request');
 
 describe('get', function () {
 
-  before(function (done) {
-    var adapter = dongle({ hostname: "localhost", port: '6767' });
+  beforeEach(function (done) {
 
     var transformIn = function (request, callback) {
       request.params.id = 123;
@@ -26,11 +25,11 @@ describe('get', function () {
       res.send(200, { message: "ok", id: req.params.id });
     });
 
-    app.get('/v1/simple', adapter(transformIn, transfromOut, url));
+    app.get('/v1/simple', dongle(transformIn, transfromOut, url));
     server.listen(app.get('port'), done);
   });
 
-  after(function (done) {
+  afterEach(function (done) {
     server.close(done);
   });
 
